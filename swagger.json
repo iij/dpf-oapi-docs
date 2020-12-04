@@ -4289,7 +4289,7 @@
             }
           },
           "400": {
-            "description": "Bad Request\n\n<details close>\n<summary>ErrorDetails</summary>\n\ncode | attribute | 対処方法\n-----|-----------|----------\nnot_found | zone | 指定したZoneIdを確認してください\ninvalid | schema | 指定したパラメータを確認してください\n\n</details>\n",
+            "description": "Bad Request\n\n<details close>\n<summary>ErrorDetails</summary>\n\ncode | attribute | 対処方法\n-----|-----------|----------\nnot_found | zone | 指定したZoneIdを確認してください\ninvalid | schema | 指定したパラメータを確認してください\nforbidden | zone | 編集中のレコードが存在しているため有効化できません\n\n</details>\n",
             "content": {
               "application/json": {
                 "schema": {
