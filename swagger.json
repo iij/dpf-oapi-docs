@@ -7,7 +7,7 @@
       "name": "IIJ サポートセンター",
       "url": "https://help.iij.ad.jp/"
     },
-    "description": "# 1. はじめに\n\n## 1.1 DPF-APIについて\nIIJ DNSプラットフォームサービスでは、DNSレコードやゾーン情報などを、\\\nお客様が用意したプログラムから自動的に操作するためのAPI機能を提供しています。\\\n以降、IIJ DNSプラットフォームサービスを「DPF」、DPFが提供するAPIを「DPF-API」あるいは単に「API」と表記します。\\\nDPF-APIの利用には、DPFの契約とIIJ IDサービスの契約が必要となります。\n\n本リファレンスマニュアルは[**OpenAPI**](https://www.openapis.org/)に準拠しています。\n\nこのWEBページはopenapi.jsonから自動生成しています。**このWEBページとopenapi.jsonの内容が異なる場合は、openapi.jsonの内容を正とします。**\nopenapi.jsonは、上部のDownloadボタンからダウンロードできます。\n\n## 1.2 サポート範囲\nDPF-APIを呼び出すためのプログラム、及びそのプログラムを稼働させるためのサーバは、お客様にてご用意ください。\\\nお客様にご用意いただくプログラムの開発、利用、動作についてのお問い合わせは承ることができません。\n\n以下の事項についてのお問い合わせは、弊社[**サポートセンター**](https://help.iij.ad.jp/)にて承ります。\n- DPF-APIの挙動が本リファレンスマニュアルと異なる場合\n- DPF-APIがシステムエラーを応答した場合\n\n## 1.3 参考資料\n- IIJ DNSプラットフォームサービス オンラインマニュアル\n  - [https://manual.iij.jp/dpf/help/](https://manual.iij.jp/dpf/help/)\n\n- IIJ IDサービス オンラインマニュアル\n  - [https://manual.iij.jp/iid/admin-help/](https://manual.iij.jp/iid/admin-help/)\n\n# 2. 利用方法\nDPF-APIは、URLとHTTPリクエストヘッダ、HTTPリクエストボディでパラメータを指定して利用します。\\\nまた、IIJ IDサービスのアクセストークンと管理対象の権限設定が必要です。\n\n## 2.1 リクエスト仕様\n\n項目 | 規格\n-----|-----\nプロトコル | HTTP/1.1、HTTP/2（https）\nHTTPメソッド | GET、POST、PATCH、PUT、DELETE\nフォーマット | JSON\n文字コード | UTF-8\nタイムアウト | 300秒\n\n- httpでのリクエストは受け付けません。必ずhttpsを使用してください。\n- DPF-APIを呼び出すプログラムは、リクエスト先が正当なものであることを確認するため、SSL証明書を検証することを推奨します。\n- 短期間に極めて多数のリクエストが行われた場合、サービスの健全性を保つためにリクエストを制限する場合があります。\n\n### アクセストークン\nAPIリクエストの際にIIJ IDサービスによって発行されたアクセストークンをAuthorizationヘッダに指定する必要があります。\\\n各APIにより必要となるアクセス権の範囲（許可するスコープ）が異なるのでご注意ください。\n\nアクセストークン作成時に指定できる「許可するスコープ」は以下のとおりです。\n\n許可するスコープ | 実行できるAPI\n-----------------|------------\ndpf_read | 参照系API\ndpf_write | 更新系、及び参照系API\ndpf_contract | 契約系API\n\n発行済のアクセストークンは、[**IIJ IDサービス**](https://www.auth.iij.jp/console/)の「アクセストークンの管理」より確認できます。\\\nDPF-APIを利用する場合は「利用するリソースサーバ」の設定で「IIJ DNSサービスAPI」を選択してください。\\\nアクセストークン管理方法のマニュアルは[**こちら**](https://manual.iij.jp/iid/admin-help/9054382.html)を参照してください。\n\n### 管理対象の権限設定\nDPFでは、管理対象となる契約単位での参照、編集権限を細かく設定できます。\\\nアクセストークンの許可するスコープが適切であっても、管理対象の権限が付与されていない場合はAPIを実行できません。\\\n管理対象の権限設定のマニュアルは[**こちら**](https://manual.iij.jp/dpf/help/19004706.html#IIJID%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%A8%E9%80%A3%E6%90%BA%E3%81%99%E3%82%8B-IIJID%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E3%81%B8%E7%AE%A1%E7%90%86%E6%A8%A9%E9%99%90%E3%82%92%E4%BB%98%E4%B8%8E%E3%81%99%E3%82%8B)を参照してください。\n\n## 2.2 HTTPリクエスト\n\n### 例\n```\n<HTTPメソッド> /dpf/<version>/<APIパス> HTTP/1.1\nHost: api.dns-platform.jp\nAuthorization: Bearer <access_token>\nContent-Type: application/json; charset=UTF-8\n\n<HTTPリクエストボディ: JSON形式のAPI固有のパラメータ>\n```\n\n### リクエストパラメータ\nDPF-APIで指定するパラメータは以下のとおりです。\\\nリクエストパラメータに同一のキーが含まれる場合の動作は保証されません。\n\n共通 | 指定箇所 | パラメータ | 意味\n-----|----------|------------|-----\n共通 | HTTPメソッド | HTTPメソッド | HTTPメソッド（値：GET、POST、PATCH、PUT、DELETE）\n共通 | URL | version | DPF-APIバージョン（値：v1）\n個別 | URL | APIパス | API名称やAPI個別のパラメータの組み合わせ\n共通 | HTTPヘッダー | access_token | IIJ IDアクセストークン（参照：[**IIJ IDサービス**](https://www.auth.iij.jp/console/)）\n個別 | HTTPボディ | APIごとに異なる | JSON形式のパラメータ\n\n## 2.3 HTTPレスポンス\n\n### 成功レスポンス\nAPIごとにレスポンスが異なります。\n\n### エラーレスポンス\nHTTPステータスコード、及びレスポンスボディによってクライアントプログラムにエラーを通知します。\n\n#### 例：アクセストークンが誤っている\n```\n{\n  \"request_id\": \"782d746ac3cb46499b31708fa80e8660\",\n  \"error_type\": \"ParameterError\",\n  \"error_message\": \"There are invalid parameters.\",\n  \"error_details\": [\n    {\n      \"code\": \"invalid\",\n      \"attribute\": \"access_token\"\n    }\n  ]\n}\n```\n\n#### エラーコード一覧\nHTTP Status Code | error_type | error_message | code | attribute | 説明 | 対処方法\n-----------------|------------|---------------|------|-----------|------|---------\n400 | ParameterError | There are invalid parameters. | invalid | access_token | 指定したアクセストークンに誤りがあります | アクセストークンを確認してください\n400 | ParameterError | JSON parse error occurred. | - | - | パラメータとして不正なJSON文字列が指定されました | リクエストのパラメータを確認してください\n400 | ParameterError | There are invalid parameters. | （API個別） | （API個別） | 不正なパラメータが指定されました | 各APIのエラーコードを確認してください\n404 | NotFound | Specified resource not found. | - | - | アクセスURLが正しくありません <br> 存在しないAPIが指定されました <br> 指定された以外のHTTPメソッドが指定されました | 左記の内容を確認してください\n429 | TooManyRequests | Too many requests. | - | - | 大量のAPIリクエストが送信されました | 単位時間当たりのAPIリクエスト数を確認してください\n500 | SystemError | System error occurred. | - | - | システム障害が発生しました | [**サポートセンター**](https://help.iij.ad.jp/)へお問い合わせください\n504 | GatewayTimeout | Gateway timeout. | - | - | リクエストがタイムアウトしました | しばらく待ってから再度リクエストしてください\n\n## 2.4 非同期リクエスト\n\nDPF-APIにおけるGET以外のAPIは全て非同期APIです。\\\n非同期APIはリクエストを受け付けると即座にレスポンスを返却しますが、\\\nリクエストに対する実際の処理は非同期で行われます。\n\n非同期リクエストの受け付けに成功した場合のHTTPステータスコードは202で、\\\n返却されたレスポンスボディには、処理進捗を確認するためのURL（jobs_url）が含まれます。\\\nこのjobs_urlに対してGETリクエストをすることで進捗状況を確認できます。\n\n進捗状況を確認した際、非同期処理が正常に終了していた場合は、\\\n返却されたレスポンスボディには、対象リソースを取得するためのURL（resources_url）が含まれます。\\\nこのresources_urlに対してGETリクエストをすることで実行結果を確認できます。\n\n### 例\n#### 非同期リクエストのレスポンス\n```\nHTTP/1.1 202 Accepted\nDate: Mon, 26 Mar 20XX hh:mm:dd GMT\nContent-Type: application/json; charset=utf-8\n〜 略 〜\n\n{\n  \"request_id\": \"782d746ac3cb46499b31708fa80e8660\",\n  \"jobs_url\": \"https://api.dns-platform.jp/dpf/<version>/jobs/<request_id>\"\n}\n```\n\n#### GETリクエスト\n```\nGET /dpf/<version>/jobs/<request_id> HTTP/1.1\nHost: api.dns-platform.jp\nAuthorization: Bearer <access_token>\nContent-Type: application/json; charset=UTF-8\n\n{}\n```\n\n#### 進捗状況のレスポンス\n```\nHTTP/1.1 200 OK\nDate: Mon, 26 Mar 20XX hh:mm:dd GMT\nContent-Type: application/json; charset=utf-8\n〜 略 〜\n\n{\n  \"request_id\": \"782d746ac3cb46499b31708fa80e8660\",\n  \"resources_url\": <resources_url>,\n  \"status\": \"SUCCESSFUL\"\n}\n```\n"
+    "description": "# 1. はじめに\n\n## 1.1 DPF-APIについて\nIIJ DNSプラットフォームサービスでは、DNSレコードやゾーン情報などを、\\\nお客様が用意したプログラムから自動的に操作するためのAPI機能を提供しています。\\\n以降、IIJ DNSプラットフォームサービスを「DPF」、DPFが提供するAPIを「DPF-API」あるいは単に「API」と表記します。\\\nDPF-APIの利用には、DPFの契約とIIJ IDサービスの契約が必要となります。\n\n本リファレンスマニュアルは[**OpenAPI**](https://www.openapis.org/)に準拠しています。\n\nこのWEBページはopenapi.jsonから自動生成しています。**このWEBページとopenapi.jsonの内容が異なる場合は、openapi.jsonの内容を正とします。**\nopenapi.jsonは、上部のDownloadボタンからダウンロードできます。\n\n## 1.2 サポート範囲\nDPF-APIを呼び出すためのプログラム、及びそのプログラムを稼働させるためのサーバは、お客様にてご用意ください。\\\nお客様にご用意いただくプログラムの開発、利用、動作についてのお問い合わせは承ることができません。\n\n以下の事項についてのお問い合わせは、弊社[**サポートセンター**](https://help.iij.ad.jp/)にて承ります。\n- DPF-APIの挙動が本リファレンスマニュアルと異なる場合\n- DPF-APIがシステムエラーを応答した場合\n\n## 1.3 参考資料\n- IIJ DNSプラットフォームサービス オンラインマニュアル\n  - [https://manual.iij.jp/dpf/help/](https://manual.iij.jp/dpf/help/)\n\n- IIJ IDサービス オンラインマニュアル\n  - [https://manual.iij.jp/iid/admin-help/](https://manual.iij.jp/iid/admin-help/)\n\n# 2. 利用方法\nDPF-APIは、URLとHTTPリクエストヘッダ、HTTPリクエストボディでパラメータを指定して利用します。\\\nまた、IIJ IDサービスのアクセストークンと管理対象の権限設定が必要です。\n\n## 2.1 リクエスト仕様\n\n項目 | 規格\n-----|-----\nプロトコル | HTTP/1.1、HTTP/2（https）\nHTTPメソッド | GET、POST、PATCH、PUT、DELETE\nフォーマット | JSON\n文字コード | UTF-8\nタイムアウト | 300秒\n\n- httpでのリクエストは受け付けません。必ずhttpsを使用してください。\n- DPF-APIを呼び出すプログラムは、リクエスト先が正当なものであることを確認するため、SSL証明書を検証することを推奨します。\n- 短期間に極めて多数のリクエストが行われた場合、サービスの健全性を保つためにリクエストを制限する場合があります。\n\n### アクセストークン\nAPIリクエストの際にIIJ IDサービスによって発行されたアクセストークンをAuthorizationヘッダに指定する必要があります。\\\n各APIにより必要となるアクセス権の範囲（許可するスコープ）が異なるのでご注意ください。\n\nアクセストークン作成時に指定できる「許可するスコープ」は以下のとおりです。\n\n許可するスコープ | 実行できるAPI\n-----------------|------------\ndpf_read | 参照系API\ndpf_write | 更新系、及び参照系API\ndpf_contract | 契約系API\n\n発行済のアクセストークンは、[**IIJ IDサービス**](https://www.auth.iij.jp/console/)の「アクセストークンの管理」より確認できます。\\\nDPF-APIを利用する場合は「利用するリソースサーバ」の設定で「IIJ DNSサービスAPI」を選択してください。\\\nアクセストークン管理方法のマニュアルは[**こちら**](https://manual.iij.jp/iid/admin-help/9054382.html)を参照してください。\n\n### 管理対象の権限設定\nDPFでは、管理対象となる契約単位での参照、編集権限を細かく設定できます。\\\nアクセストークンの許可するスコープが適切であっても、管理対象の権限が付与されていない場合はAPIを実行できません。\\\n管理対象の権限設定のマニュアルは[**こちら**](https://manual.iij.jp/dpf/help/19004706.html#IIJID%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%A8%E9%80%A3%E6%90%BA%E3%81%99%E3%82%8B-IIJID%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E3%81%B8%E7%AE%A1%E7%90%86%E6%A8%A9%E9%99%90%E3%82%92%E4%BB%98%E4%B8%8E%E3%81%99%E3%82%8B)を参照してください。\n\n## 2.2 HTTPリクエスト\n\n### 例\n```\n<HTTPメソッド> /dpf/<version>/<APIパス> HTTP/1.1\nHost: api.dns-platform.jp\nAuthorization: Bearer <access_token>\nContent-Type: application/json; charset=UTF-8\n\n<HTTPリクエストボディ: JSON形式のAPI固有のパラメータ>\n```\n\n### リクエストパラメータ\nDPF-APIで指定するパラメータは以下のとおりです。\\\nリクエストパラメータに同一のキーが含まれる場合の動作は保証されません。\n\n共通 | 指定箇所 | パラメータ | 意味\n-----|----------|------------|-----\n共通 | HTTPメソッド | HTTPメソッド | HTTPメソッド（値：GET、POST、PATCH、PUT、DELETE）\n共通 | URL | version | DPF-APIバージョン（値：v1）\n個別 | URL | APIパス | API名称やAPI個別のパラメータの組み合わせ\n共通 | HTTPヘッダー | access_token | IIJ IDアクセストークン（参照：[**IIJ IDサービス**](https://www.auth.iij.jp/console/)）\n個別 | HTTPボディ | APIごとに異なる | JSON形式のパラメータ\n\n## 2.3 HTTPレスポンス\n\n### 成功レスポンス\nAPIごとにレスポンスが異なります。\n\n### エラーレスポンス\nHTTPステータスコード、及びレスポンスボディによってクライアントプログラムにエラーを通知します。\n\n#### 例：アクセストークンが誤っている\n```\n{\n  \"request_id\": \"782d746ac3cb46499b31708fa80e8660\",\n  \"error_type\": \"ParameterError\",\n  \"error_message\": \"There are invalid parameters.\",\n  \"error_details\": [\n    {\n      \"code\": \"invalid\",\n      \"attribute\": \"access_token\"\n    }\n  ]\n}\n```\n\n#### エラーコード一覧\nHTTP Status Code | error_type | error_message | code | attribute | 説明 | 対処方法\n-----------------|------------|---------------|------|-----------|------|---------\n400 | ParameterError | There are invalid parameters. | invalid | access_token | 指定したアクセストークンに誤りがあります | アクセストークンを確認してください\n400 | ParameterError | JSON parse error occurred. | - | - | パラメータとして不正なJSON文字列が指定されました | リクエストのパラメータを確認してください\n400 | ParameterError | There are invalid parameters. | （API個別） | （API個別） | 不正なパラメータが指定されました | 各APIのエラーコードを確認してください\n404 | NotFound | Specified resource not found. | - | - | アクセスURLが正しくありません <br> 存在しないAPIが指定されました <br> 指定された以外のHTTPメソッドが指定されました | 左記の内容を確認してください\n429 | TooManyRequests | Too many requests. | - | - | 大量のAPIリクエストが送信されました | 単位時間当たりのAPIリクエスト数が多いため、リクエスト数を抑えてください\n500 | SystemError | System error occurred. | - | - | システム障害が発生しました | [**サポートセンター**](https://help.iij.ad.jp/)へお問い合わせください<br>お問い合わせの際にリクエストの詳細時間及びrequest_idをお伝えください\n503 | ServiceUnavailable | Service unavailable. | - | - | メンテナンス中もしくはアクセスが集中しています | しばらく待ってから再度リクエストしてください<br>メンテナンス内容についてはサービスオンラインでご確認ください\n504 | GatewayTimeout | Gateway timeout. | - | - | リクエストがタイムアウトしました | しばらく待ってから再度リクエストしてください\n\n## 2.4 非同期リクエスト\n\nDPF-APIにおけるGET以外のAPIは全て非同期APIです。\\\n非同期APIはリクエストを受け付けると即座にレスポンスを返却しますが、\\\nリクエストに対する実際の処理は非同期で行われます。\n\n非同期リクエストの受け付けに成功した場合のHTTPステータスコードは202で、\\\n返却されたレスポンスボディには、処理進捗を確認するためのURL（jobs_url）が含まれます。\\\nこのjobs_urlに対してGETリクエストをすることで進捗状況を確認できます。\n\n進捗状況を確認した際、非同期処理が正常に終了していた場合は、\\\n返却されたレスポンスボディには、対象リソースを取得するためのURL（resources_url）が含まれます。\\\nこのresources_urlに対してGETリクエストをすることで実行結果を確認できます。\n\n### 例\n#### 非同期リクエストのレスポンス\n```\nHTTP/1.1 202 Accepted\nDate: Mon, 26 Mar 20XX hh:mm:dd GMT\nContent-Type: application/json; charset=utf-8\n〜 略 〜\n\n{\n  \"request_id\": \"782d746ac3cb46499b31708fa80e8660\",\n  \"jobs_url\": \"https://api.dns-platform.jp/dpf/<version>/jobs/<request_id>\"\n}\n```\n\n#### GETリクエスト\n```\nGET /dpf/<version>/jobs/<request_id> HTTP/1.1\nHost: api.dns-platform.jp\nAuthorization: Bearer <access_token>\nContent-Type: application/json; charset=UTF-8\n\n{}\n```\n\n#### 進捗状況のレスポンス\n```\nHTTP/1.1 200 OK\nDate: Mon, 26 Mar 202X hh:mm:dd GMT\nContent-Type: application/json; charset=utf-8\n〜 略 〜\n\n{\n  \"request_id\": \"782d746ac3cb46499b31708fa80e8660\",\n  \"resources_url\": <resources_url>,\n  \"status\": \"SUCCESSFUL\"\n}\n```\n"
   },
   "servers": [
     {
@@ -632,7 +632,7 @@
       "post": {
         "operationId": "postCcSecTransferAcl",
         "summary": "ゾーン転送ACLの作成",
-        "description": "新しくゾーン転送ACLを作成します。\\\n作成できる最大件数は5件です。\n",
+        "description": "新しくゾーン転送ACLを作成します。\\\n作成できる最大件数は10件です。\n",
         "tags": [
           "cc_sec_transfer_acls"
         ],
@@ -3716,6 +3716,7 @@
     },
     "/ping": {
       "get": {
+        "x-iij-operationId": "getPing",
         "operationId": "getPing",
         "summary": "API疎通確認",
         "description": "APIへの疎通を確認できます。\n",
@@ -3945,7 +3946,7 @@
             }
           },
           "400": {
-            "description": "Bad Request\n\n<details close>\n<summary>ErrorDetails</summary>\n\ncode | attribute | 対処方法\n-----|-----------|----------\ninvalid | schema | 指定したパラメータを確認してください\nnot_found | zone | 指定したZoneIdを確認してください\nforbidden | zone | ゾーンプロキシの設定が有効のため操作できません\ntoo_large | records | 指定したパラメータのデータ量が10Mibを超えています\nrequired | records | レコードのパラメータを指定してください\nduplicated | records | 同一nameおよびrrtypeのレコードを指定しています\ninvalid | records | レコードとして不正な形式です\ninvalid_type | records | 指定したレコードの型を確認してください\ninvalid_length | records | 指定したレコードの文字数を確認してください\ninvalid_char_type | records | 指定したレコードの文字種を確認してください\ninvalid_format | records | 指定したレコードのフォーマットを確認してください\nout_of_range | records | 指定したパラメータの数値を確認してください\ntoo_few | records | 登録の必須指定数を下回っています\ntoo_many | records | 登録の上限数を超えています\nforbidden | records | 許可されていない値を指定しています\nsoa_not_found | records | SOAレコードを指定してください\napex_ns_not_found | records | Zone ApexのNSレコードを指定してください\ncname_and_other_mixed | records | 指定したNameがCNAMEと同一のため操作できません\ncorresponding_ns_not_found | records | 指定したDSレコードのnameに対応するNSレコードが存在していません\ninvalid_quotes | records | TXTレコードのrdataは「\"」で囲むようにしてください。<br>JSON string として \" で囲まれている内部に、さらに rdata としての \" で囲んで含める必要があります。<br>したがって、JSON string 全体としては \"\\\\\"example\\\\\"\" といった形になります。\nreference_not_found | records | 参照先が存在しません\nreference_alias | records | 指定した参照先がCNAMEです\nmultiple_rdata_found | records | 指定したレコードタイプでは複数のrdataを指定することはできません\ninvalid_length_key | records | 指定したlabel_keyの文字数を確認してください\ninvalid_char_type_key | records | 指定したlabel_keyの文字種を確認してください\ninvalid_format_key | records | 指定したlabel_keyのフォーマットを確認してください\ninvalid_type_value | records | 指定したlabel_valueの型を確認してください\ninvalid_length_value | records | 指定したlabel_valueの文字数を確認してください\ninvalid_char_type_value | records | 指定したlabel_valueの文字種を確認してください\ninvalid_format_value | records | 指定したlabel_valueのフォーマットを確認してください\n</details>\n",
+            "description": "Bad Request\n\n<details close>\n<summary>ErrorDetails</summary>\n\ncode | attribute | 対処方法\n-----|-----------|----------\ninvalid | schema | 指定したパラメータを確認してください\nnot_found | zone | 指定したZoneIdを確認してください\nforbidden | zone | ゾーンプロキシの設定が有効のため操作できません\ntoo_large | records | 指定したパラメータのデータ量が10Mibを超えています\nrequired | records | レコードのパラメータを指定してください\nduplicated | records | 同一nameおよびrrtypeのレコードを指定しています\ninvalid | records | レコードとして不正な形式です\ninvalid_type | records | 指定したレコードの型を確認してください\ninvalid_length | records | 指定したレコードの文字数を確認してください\ninvalid_char_type | records | 指定したレコードの文字種を確認してください\ninvalid_format | records | 指定したレコードのフォーマットを確認してください\nout_of_range | records | 指定したパラメータの数値を確認してください\ntoo_few | records | 登録の必須指定数を下回っています\ntoo_many | records | 登録の上限数を超えています\nforbidden | records | 許可されていない値を指定しています\nsoa_not_found | records | SOAレコードを指定してください\napex_ns_not_found | records | Zone ApexのNSレコードを指定してください\nout_of_zone | records | ゾーン範囲外のNameを指定しています\ncname_and_other_mixed | records | 指定したNameがCNAMEと同一のため操作できません\ncorresponding_ns_not_found | records | 指定したDSレコードのnameに対応するNSレコードが存在していません\ninvalid_quotes | records | TXTレコードのrdataは「\"」で囲むようにしてください。<br>JSON string として \" で囲まれている内部に、さらに rdata としての \" で囲んで含める必要があります。<br>したがって、JSON string 全体としては \"\\\\\"example\\\\\"\" といった形になります。\nreference_not_found | records | 参照先が存在しません\nreference_alias | records | 指定した参照先がCNAMEです\nmultiple_rdata_found | records | 指定したレコードタイプでは複数のrdataを指定することはできません\ninvalid_length_key | records | 指定したlabel_keyの文字数を確認してください\ninvalid_char_type_key | records | 指定したlabel_keyの文字種を確認してください\ninvalid_format_key | records | 指定したlabel_keyのフォーマットを確認してください\ninvalid_type_value | records | 指定したlabel_valueの型を確認してください\ninvalid_length_value | records | 指定したlabel_valueの文字数を確認してください\ninvalid_char_type_value | records | 指定したlabel_valueの文字種を確認してください\ninvalid_format_value | records | 指定したlabel_valueのフォーマットを確認してください\n</details>\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -4592,7 +4593,7 @@
             }
           },
           "400": {
-            "description": "Bad Request\n\n<details close>\n<summary>ErrorDetails</summary>\n\ncode | attribute | 対処方法\n-----|-----------|----------\nnot_found | zone | 指定したZoneIdを確認してください\nforbidden | zone | ゾーンプロキシの設定が有効のため操作できません\ninvalid | schema | 指定したパラメータを確認してください\nnot_found | record | 指定したRecordIdを確認してください\nforbidden | record | レコードの状態を確認してください\nsoa_not_found | record | SOAレコードの削除はできません\napex_ns_not_found | record | Zone ApexのNSレコードのため削除はできません\ncorresponding_ns_not_found | name | 同一nameのDSレコードが存在するためNSレコードの削除はできません\nreference_not_found | rdata | 参照先が存在しないため削除できません\n\n</details>\n",
+            "description": "Bad Request\n\n<details close>\n<summary>ErrorDetails</summary>\n\ncode | attribute | 対処方法\n-----|-----------|----------\nnot_found | zone | 指定したZoneIdを確認してください\nforbidden | zone | ゾーンプロキシの設定が有効のため操作できません\ninvalid | schema | 指定したパラメータを確認してください\nnot_found | record | 指定したRecordIdを確認してください\nforbidden | record | レコードの状態を確認してください\nsoa_not_found | record | SOAレコードの削除はできません\napex_ns_not_found | record | Zone ApexのNSレコードのため削除はできません\ncorresponding_ns_not_found | name | 同一nameのDSレコードが存在するためNSレコードの削除はできません\nreference_not_found | rdata | 参照元が存在するため削除できません\n\n</details>\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -5980,7 +5981,7 @@
             }
           },
           "400": {
-            "description": "Bad Request\n\n<details close>\n<summary>ErrorDetails</summary>\n\ncode | attribute | 対処方法\n-----|-----------|----------\nnot_found | zone | 指定したZoneIdを確認してください\ninvalid | schema | 指定したパラメータを確認してください\nforbidden | zone | ゾーンプロキシの設定が有効のため操作できません\nreference_not_found | rdata | rdetaの参照先が存在しません\nresolve_error | rdata | 名前解決ができないゾーンが含まれています\n\n</details>\n",
+            "description": "Bad Request\n\n<details close>\n<summary>ErrorDetails</summary>\n\ncode | attribute | 対処方法\n-----|-----------|----------\nnot_found | zone | 指定したZoneIdを確認してください\ninvalid | schema | 指定したパラメータを確認してください\nforbidden | zone | ゾーンプロキシの設定が有効のため操作できません\nreference_not_found | rdata | rdataの参照先が存在しません\nresolve_error | rdata | 名前解決ができないゾーンが含まれています\n\n</details>\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -6028,6 +6029,74 @@
           },
           "400": {
             "description": "Bad Request\n\n<details close>\n<summary>ErrorDetails</summary>\n\ncode | attribute | 対処方法\n-----|-----------|----------\nnot_found | zone | 指定したZoneIdを確認してください\ninvalid | schema | 指定したパラメータを確認してください\nforbidden | zone | ゾーンプロキシの設定が有効のため操作できません\n\n</details>\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequest"
+                },
+                "examples": {
+                  "BadRequest": {
+                    "$ref": "#/components/examples/BadRequest"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/zones/{ZoneId}/atomic_changes": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ZoneId"
+        }
+      ],
+      "patch": {
+        "operationId": "patchZoneAtomicChanges",
+        "summary": "レコードの一括更新とゾーン反映",
+        "description": "レコードの一括更新とゾーンの反映をアトミックに処理します。\n",
+        "tags": [
+          "zones"
+        ],
+        "security": [
+          {
+            "DPFOperator": [
+              "dpf_write"
+            ]
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchZoneAtomicChanges"
+              },
+              "examples": {
+                "PatchZoneCommit": {
+                  "$ref": "#/components/examples/PatchZoneAtomicChanges"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AsyncResponse"
+                },
+                "examples": {
+                  "AsyncResponse": {
+                    "$ref": "#/components/examples/AsyncResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request\n\n<details close>\n<summary>ErrorDetails</summary>\n\ncode | attribute | 対処方法\n-----|-----------|----------\ninvalid | schema | 指定したパラメータを確認してください\nnot_found | zone | 指定したZoneIdを確認してください\nforbidden | zone | ゾーンプロキシの設定が有効のため操作できません\ntoo_large | records | 指定したパラメータのデータ量が10Mibを超えています\nrequired | records | レコードのパラメータを指定してください\nduplicated | records | 同一nameおよびrrtypeのレコードを指定しています\ninvalid | records | レコードとして不正な形式です\ninvalid_type | records | 指定したレコードの型を確認してください\ninvalid_length | records | 指定したレコードの文字数を確認してください\ninvalid_char_type | records | 指定したレコードの文字種を確認してください\ninvalid_format | records | 指定したレコードのフォーマットを確認してください\nout_of_range | records | 指定したパラメータの数値を確認してください\ntoo_few | records | 登録の必須指定数を下回っています\ntoo_many | records | 登録の上限数を超えています\nforbidden | records | 許可されていない値を指定しています\nsoa_not_found | records | SOAレコードを指定してください\napex_ns_not_found | records | Zone ApexのNSレコードを指定してください\nout_of_zone | records | ゾーン範囲外のNameを指定しています\ncname_and_other_mixed | records | 指定したNameがCNAMEと同一のため操作できません\ncorresponding_ns_not_found | records | 指定したDSレコードのnameに対応するNSレコードが存在していません\ninvalid_quotes | records | TXTレコードのrdataは「\"」で囲むようにしてください。<br>JSON string として \" で囲まれている内部に、さらに rdata としての \" で囲んで含める必要があります。<br>したがって、JSON string 全体としては \"\\\\\"example\\\\\"\" といった形になります。\nreference_not_found | records | 参照先が存在しません\nreference_alias | records | 指定した参照先がCNAMEです\nresolve_error | records | 指定した参照先の名前解決ができません\nmultiple_rdata_found | records | 指定したレコードタイプでは複数のrdataを指定することはできません\ninvalid_length_key | records | 指定したlabel_keyの文字数を確認してください\ninvalid_char_type_key | records | 指定したlabel_keyの文字種を確認してください\ninvalid_format_key | records | 指定したlabel_keyのフォーマットを確認してください\ninvalid_type_value | records | 指定したlabel_valueの型を確認してください\ninvalid_length_value | records | 指定したlabel_valueの文字数を確認してください\ninvalid_char_type_value | records | 指定したlabel_valueの文字種を確認してください\ninvalid_format_value | records | 指定したlabel_valueのフォーマットを確認してください\n</details>\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -10704,6 +10773,27 @@
           "TXT"
         ]
       },
+      "RecordsRrtypeWithoutSoa": {
+        "type": "string",
+        "description": "レコードタイプ",
+        "enum": [
+          "A",
+          "AAAA",
+          "ANAME",
+          "CAA",
+          "CNAME",
+          "DS",
+          "HTTPS",
+          "MX",
+          "NAPTR",
+          "NS",
+          "PTR",
+          "SRV",
+          "SVCB",
+          "TLSA",
+          "TXT"
+        ]
+      },
       "DsRecordsRrtype": {
         "type": "string",
         "description": "レコードタイプ",
@@ -10734,6 +10824,51 @@
           3,
           5
         ]
+      },
+      "OverwriteRecords": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "required": [
+            "name",
+            "ttl",
+            "rrtype",
+            "rdata",
+            "labels",
+            "description"
+          ],
+          "properties": {
+            "name": {
+              "$ref": "#/components/schemas/RecordsName"
+            },
+            "ttl": {
+              "$ref": "#/components/schemas/RecordsTtl"
+            },
+            "rrtype": {
+              "$ref": "#/components/schemas/RecordsRrtype"
+            },
+            "rdata": {
+              "$ref": "#/components/schemas/RecordsRdata"
+            },
+            "description": {
+              "$ref": "#/components/schemas/Description"
+            },
+            "labels": {
+              "$ref": "#/components/schemas/RecordLabels"
+            }
+          }
+        }
+      },
+      "OverwriteSoa": {
+        "type": "boolean",
+        "description": "指定されたSOAレコードを取り込むためのフラグ",
+        "default": true
+      },
+      "OverwriteZoneApexNs": {
+        "type": "boolean",
+        "description": "指定されたZone Apex NSレコードを取り込むためのフラグ",
+        "default": true
       },
       "Record": {
         "type": "object",
@@ -10818,56 +10953,13 @@
         ],
         "properties": {
           "records": {
-            "type": "array",
-            "minItems": 1,
-            "items": {
-              "type": "object",
-              "required": [
-                "name",
-                "ttl",
-                "rrtype",
-                "rdata",
-                "labels",
-                "description"
-              ],
-              "properties": {
-                "name": {
-                  "$ref": "#/components/schemas/RecordsName"
-                },
-                "ttl": {
-                  "$ref": "#/components/schemas/RecordsTtl"
-                },
-                "rrtype": {
-                  "type": "string",
-                  "description": "レコードタイプ",
-                  "enum": [
-                    "A",
-                    "AAAA",
-                    "CAA",
-                    "CNAME",
-                    "DS",
-                    "NS",
-                    "MX",
-                    "NAPTR",
-                    "SOA",
-                    "SRV",
-                    "TXT",
-                    "TLSA",
-                    "ANAME",
-                    "PTR"
-                  ]
-                },
-                "rdata": {
-                  "$ref": "#/components/schemas/RecordsRdata"
-                },
-                "description": {
-                  "$ref": "#/components/schemas/Description"
-                },
-                "labels": {
-                  "$ref": "#/components/schemas/RecordLabels"
-                }
-              }
-            }
+            "$ref": "#/components/schemas/OverwriteRecords"
+          },
+          "overwrite_soa": {
+            "$ref": "#/components/schemas/OverwriteSoa"
+          },
+          "overwrite_zone_apex_ns": {
+            "$ref": "#/components/schemas/OverwriteZoneApexNs"
           }
         }
       },
@@ -10886,23 +10978,7 @@
             "$ref": "#/components/schemas/RecordsTtl"
           },
           "rrtype": {
-            "type": "string",
-            "description": "レコードタイプ",
-            "enum": [
-              "A",
-              "AAAA",
-              "CAA",
-              "CNAME",
-              "DS",
-              "NS",
-              "MX",
-              "NAPTR",
-              "SRV",
-              "TXT",
-              "TLSA",
-              "ANAME",
-              "PTR"
-            ]
+            "$ref": "#/components/schemas/RecordsRrtypeWithoutSoa"
           },
           "rdata": {
             "$ref": "#/components/schemas/RecordsRdata"
@@ -11275,6 +11351,26 @@
         "properties": {
           "description": {
             "$ref": "#/components/schemas/Description"
+          }
+        }
+      },
+      "PatchZoneAtomicChanges": {
+        "type": "object",
+        "required": [
+          "records"
+        ],
+        "properties": {
+          "records": {
+            "$ref": "#/components/schemas/OverwriteRecords"
+          },
+          "description": {
+            "$ref": "#/components/schemas/Description"
+          },
+          "overwrite_soa": {
+            "$ref": "#/components/schemas/OverwriteSoa"
+          },
+          "overwrite_zone_apex_ns": {
+            "$ref": "#/components/schemas/OverwriteZoneApexNs"
           }
         }
       },
@@ -14738,7 +14834,9 @@
               "labels": {},
               "description": ""
             }
-          ]
+          ],
+          "overwrite_soa": true,
+          "overwrite_zone_apex_ns": false
         }
       },
       "PostRecord": {
@@ -15006,6 +15104,63 @@
       "PatchZoneCommit": {
         "value": {
           "description": "description"
+        }
+      },
+      "PatchZoneAtomicChanges": {
+        "value": {
+          "records": [
+            {
+              "name": "example.com.",
+              "ttl": null,
+              "rrtype": "SOA",
+              "rdata": [
+                {
+                  "value": "ns000.d-53.net. dns-managers.iij.ad.jp. 1 3600 600 604800 900"
+                }
+              ],
+              "labels": {
+                "key1": "value1",
+                "key2": "value2"
+              },
+              "description": ""
+            },
+            {
+              "name": "example.com.",
+              "ttl": 300,
+              "rrtype": "NS",
+              "rdata": [
+                {
+                  "value": "ns001-xxxxxxxxxxxxxxxx.o.d-53.jp."
+                },
+                {
+                  "value": "ns001-xxxxxxxxxxxxxxxx.o.d-53.net."
+                },
+                {
+                  "value": "ns001-xxxxxxxxxxxxxxxx.o.d-53.info."
+                }
+              ],
+              "labels": {
+                "key3": "value3",
+                "key4": "value4"
+              },
+              "description": "comment"
+            },
+            {
+              "name": "sample.example.com.",
+              "ttl": 600,
+              "rrtype": "TXT",
+              "rdata": [
+                {
+                  "value": "\"sample\""
+                }
+              ],
+              "labels": {},
+              "description": ""
+            }
+          ],
+          "description": "description",
+          "overwrite_soa": true,
+          "overwrite_zone_apex_ns": false
         }
       },
       "GetManagedServers": {
