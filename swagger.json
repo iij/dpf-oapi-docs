@@ -6774,7 +6774,7 @@
             }
           },
           "400": {
-            "description": "Bad Request\n\n<details close>\n<summary>ErrorDetails</summary>\n\ncode | attribute | 対処方法\n-----|-----------|----------\nnot_found | lb_domain | 指定したLbDomainIdを確認してください\nduplicated | resource_name | 指定したMonitoringResourceNameは既に登録されています\ninvalid_length | resource_name | 指定したMonitoringResourceNameの文字数を確認してください\ninvalid_format | resource_name | 指定したMonitoringResourceNameのフォーマットを確認してください\nduplicated | name | 指定した監視名は既に登録されています\ntoo_many | name | 登録の上限数を超えています\ninvalid_format | name | 指定した監視名のフォーマットを確認してください\ninvalid_format | tls_sni | 指定したTLS SNIのフォーマットを確認してください\ninvalid_format_status_code | status_codes | 指定したステータスコードのフォーマットを確認してください\ninvalid | schema | 指定したパラメータを確認してください\n\n</details>\n",
+            "description": "Bad Request\n\n<details close>\n<summary>ErrorDetails</summary>\n\ncode | attribute | 対処方法\n-----|-----------|----------\nnot_found | lb_domain | 指定したLbDomainIdを確認してください\nduplicated | resource_name | 指定したMonitoringResourceNameは既に登録されています\ninvalid_length | resource_name | 指定したMonitoringResourceNameの文字数を確認してください\ninvalid_format | resource_name | 指定したMonitoringResourceNameのフォーマットを確認してください\nduplicated | name | 指定した監視名は既に登録されています\ntoo_many | name | 登録の上限数を超えています\ninvalid_format | name | 指定した監視名のフォーマットを確認してください\ninvalid_format | tls_sni | 指定したTLS SNIのフォーマットを確認してください\ninvalid_length_field_value | headers | 指定したHostヘッダーの文字数を確認してください\ninvalid_char_type_field_value | headers | 指定したHostヘッダーの文字種を確認してください\ninvalid_format_field_value | headers | 指定したHostヘッダーのフォーマットを確認してください\ninvalid_format_status_code | status_codes | 指定したステータスコードのフォーマットを確認してください\ninvalid | schema | 指定したパラメータを確認してください\n\n</details>\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -6901,7 +6901,7 @@
             }
           },
           "400": {
-            "description": "Bad Request\n\n<details close>\n<summary>ErrorDetails</summary>\n\ncode | attribute | 対処方法\n-----|-----------|----------\nnot_found | lb_domain | 指定したLbDomainIdを確認してください\nnot_found | monitoring | 指定したMonitoringResourceNameを確認してください\nduplicated | name | 指定した監視名は既に登録されています\ninvalid_format | name | 指定した監視名のフォーマットを確認してください\ninvalid_format | tls_sni | 指定したTLS SNIのフォーマットを確認してください\ninvalid_format_status_code | status_codes | 指定したステータスコードのフォーマットを確認してください\ninvalid | schema | 指定したパラメータを確認してください\n\n</details>\n",
+            "description": "Bad Request\n\n<details close>\n<summary>ErrorDetails</summary>\n\ncode | attribute | 対処方法\n-----|-----------|----------\nnot_found | lb_domain | 指定したLbDomainIdを確認してください\nnot_found | monitoring | 指定したMonitoringResourceNameを確認してください\nduplicated | name | 指定した監視名は既に登録されています\ninvalid_format | name | 指定した監視名のフォーマットを確認してください\ninvalid_format | tls_sni | 指定したTLS SNIのフォーマットを確認してください\ninvalid_length_field_value | headers | 指定したHostヘッダーの文字数を確認してください\ninvalid_char_type_field_value | headers | 指定したHostヘッダーの文字種を確認してください\ninvalid_format_field_value | headers | 指定したHostヘッダーのフォーマットを確認してください\ninvalid_format_status_code | status_codes | 指定したステータスコードのフォーマットを確認してください\ninvalid | schema | 指定したパラメータを確認してください\n\n</details>\n",
             "content": {
               "application/json": {
                 "schema": {
