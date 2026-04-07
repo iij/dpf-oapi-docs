@@ -1,0 +1,11 @@
+[extend]
+useDefault = true
+
+## DNS Teams common
+
+[[allowlists]]
+description = "example value"
+stopwords = [
+    '''MDEyMzU2Nzg5YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXo=''',
+    '''YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXowMTIzNTY3ODk=''',
+]
